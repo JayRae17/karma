@@ -99,8 +99,8 @@ describe('View Upcoming Events', function() {
     describe('should call the "getInput" function', function() {
         beforeEach(function() {
             var form = {
-                prd = "week",
-                category = "wed"
+                prd: 'week',
+                category: 'wed'
             }
         });
 
@@ -119,6 +119,35 @@ describe('View Upcoming Events', function() {
 
 
     describe('should call the "getEvents" function', function() {
+        var allEvents = {
+            evnt1,
+            evnt2,
+            evnt3
+        };
+
+        var evnt1 = {
+            id: '48393',
+            name: "Jada's Wedding",
+            category: "wed",
+            date: '18032020',
+            room: ["ReceptionRm1", "BallRm2"]	
+        };
+
+        var evnt2 = {
+            id: '39278',
+            name: "NCB Conference",
+            category: "cnfn",
+            date: '20042020',
+            room: ["ConferenceRm4"]	
+        };
+
+        var evnt3 = {
+            id: '24843',
+            name: "Summer Party",
+            category: "prty",
+            date: '01072020',
+            room: ["Backyard", "PoolRm1"]	
+        };
         
         it('and this function should be called with the getPeriod function', function() {
             spyOn('getPeriod').andReturn(true);
@@ -126,9 +155,9 @@ describe('View Upcoming Events', function() {
             expect (getPeriod).toBeCalled();
         });
 
-        it('and this function should return the number of events that meet the criteria', function() {
+        it('and this function should return the events that meet the criteria', function() {
             var result = getEvents('','wed');
-            expect (result).length.toBe('2');
+            expect (result).length.toBe('1');
         });
 
     });
@@ -138,34 +167,34 @@ describe('View Upcoming Events', function() {
     describe('should call the "getPeriod" function', function() {
         beforeEach(function() {
             var evnt1 = {
-                id: 48393,
+                id: '48393',
                 name: "Jada's Wedding",
                 category: "wed",
-                date: 18032020,
+                date: '18032020',
                 room: ["ReceptionRm1", "BallRm2"]	
             };
 
             var evnt2 = {
-                id: 39278,
+                id: '39278',
                 name: "NCB Conference",
                 category: "cnfn",
-                date: 20042020,
+                date: '20042020',
                 room: ["ConferenceRm4"]	
             };
 
             var evnt3 = {
-                id: 24843,
+                id: '24843',
                 name: "Summer Party",
                 category: "prty",
-                date: 01072020,
+                date: '01072020',
                 room: ["Backyard", "PoolRm1"]	
             };
 
             var badEvnt = {
-                id: 24843,
+                id: '24843',
                 name: "Summer Party",
                 category: "not category",
-                date: 01072020,
+                date: '01072020',
                 room: ["Backyard", "PoolRm1"]	
             };
         
@@ -196,9 +225,3 @@ describe('View Upcoming Events', function() {
 
 });
 
-
-
-   
-
-
-/* if period is equal and if category is equal then return true*/
