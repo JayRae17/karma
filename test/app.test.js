@@ -1,112 +1,204 @@
-/**
- * 
- * 
- * 
- * 
- 
-
-
-Log user feedback to a database.
+/* 
+VIEW UPCOMING EVENTS
 INPUTS
-- name
-- email address
-- feedback
-- category
-- createDatetime
-
-var feedback = {
-    name: "",
-    email: "",
-    feedback: "",
-    category: "",
-    createDatetime: ""    
-};
-
+- eventPeriod
+- event Category
 
 OUTPUTS
-- written to a database
-FUNCTIONS
-1. feedbackInput - collect the feedback & calls feedbackValidator, formatDateTime
-2. saveFeedback - write the feedback to a database & calls feedbackInputs
-3. feedbackValidator - no empty fields for the feedback & calls emailValidator
-4. emailValidator - validates email
-5. formatDateTime - ensures UTC standard is enforced
+- events displayed
+
+var event = {
+    id: ""
+    name: ""
+    category: ""
+    date: ""
+    room: []  //would be an array
+}
+ input = [this week, wedding]
+ event = [28372, Jada's Wedding, Wedding, July 21 2020, [BallRoom,Reception Room]]
+
+ PERIOD CLASSIFICATION:
+ This week - 'week'
+ This month -  'mnth'
+ This year - 'yr'
+ Next year - 'nyr'
+
+ EVENT CLASSIFICATION:
+ Wedding - 'wed'
+ Parties -  'prty'
+ Conference - 'cnfn'
+ Awards Ceremonies - 'awrd'
+
+FUNCTIONS:
+1. displayEvents - Displays events matching inputted criteria. Calls getEvents with getInput
+2. getInput -       retrieves and returns the input entered by user (includes category and period of event) 
+3. getEvents -      Compares the input variables with event attributes in the database and returns 
+                    those events whose varaibles match input variables. Calls getPeriod
+4. getPeriod -      retrieves period of event (compares it to current date to establish period date falls under)
+                    and returns period (current week/month)
+
+*/
+
+describe('View Upcoming Events', function() {
+
+    it ('should have displayEvents defined', function() {
+        expect(displayEvents.toBeDefined());
+    });
+
+    it ('should have getInput defined',function() {
+        expect(getInput.toBeDefined());
+    });
+
+    it ('should have getEvents defined', function() {
+        expect(getEvents.toBeDefined());
+    });
+
+     it ('should have getPeriod defined', function() {
+        expect(getPeriod.toBeDefined());
+    });
 
 
 
- * 
- * 
- */
-describe('The log user feedback to a database test case', function(){
-    it('should have feedbackInut defined', function() {
-        expect(feedbackInput).toBeDefined();
+
+    describe('should call the "displayEvents" function', function() {
+        
+        it('and this function should call getEvents function', function() {
+            spyOn('getEvents').andReturn(true);
+            displayEvents();
+            expect (getEvents).toHaveBeenCalledWith(['week', 'wedding']);
+        });
+
+         it('and this function should call getInput function', function() {
+            spyOn('getInput').andReturn(true);
+            displayEvents();
+            expect (getInput).toBeCalled();
+        });
+
+        it('and this function should return an array of events', function() {
+            spyOn('getEvents').andReturn(eventsArr);
+            var result = displayEvents();
+            expect (result).toBe(eventsArr);
+        });
+
+        it('and this function should return NO UPCOMING EVENTS when getEvents function returns nothing', function() {
+            spyOn('getEvents').andReturn(null);
+            var result = displayEvents();
+            expect (result).toBe('No Upcoming Events');
+        });
+
+        it('and this function should return false when a string is returned', function() {
+            spyOn('getEvents').andReturn("hello");
+            var result = displayEvents();
+            expect (result).toBeFalsy();
+        });
+
     });
-    it('should have saveFeedback defined', function() {
-        expect(saveFeedback).toBeDefined();
-    });
-    it('should have feedbackValidator defined', function() {
-        expect(feedbackValidator).toBeDefined();
-    });
-    it('should have emailValidator defined', function() {
-        expect(emailValidator).toBeDefined();
-    });
-    it('should have formatDateTime defined', function() {
-        expect(formatDateTime).toBeDefined();
-    });
-    describe('should call the "feedbackInput" function', function(){
+
+
+
+    describe('should call the "getInput" function', function() {
         beforeEach(function() {
-            var feedback = {
-                name: "",
-                email: "",
-                description: "",
-                category: "",
-                createDatetime: ""    
+            var form = {
+                prd = "week",
+                category = "wed"
+            }
+        });
+
+        it ('and this function should return input from the form in an array', function() {
+            var result = getInput(form);
+            expect (result).toBe(['week','wed']);
+        });
+
+        it ('and this function should return input from the form in an array', function() {
+            var result = getInput("");
+            expect (result).toBeFalsy();
+        });
+        
+    });
+
+
+
+    describe('should call the "getEvents" function', function() {
+        
+        it('and this function should be called with the getPeriod function', function() {
+            spyOn('getPeriod').andReturn(true);
+            getEvents();
+            expect (getPeriod).toBeCalled();
+        });
+
+        it('and this function should return the number of events that meet the criteria', function() {
+            var result = getEvents('','wed');
+            expect (result).length.toBe('2');
+        });
+
+    });
+
+
+
+    describe('should call the "getPeriod" function', function() {
+        beforeEach(function() {
+            var evnt1 = {
+                id: 48393,
+                name: "Jada's Wedding",
+                category: "wed",
+                date: 18032020,
+                room: ["ReceptionRm1", "BallRm2"]	
             };
+
+            var evnt2 = {
+                id: 39278,
+                name: "NCB Conference",
+                category: "cnfn",
+                date: 20042020,
+                room: ["ConferenceRm4"]	
+            };
+
+            var evnt3 = {
+                id: 24843,
+                name: "Summer Party",
+                category: "prty",
+                date: 01072020,
+                room: ["Backyard", "PoolRm1"]	
+            };
+
+            var badEvnt = {
+                id: 24843,
+                name: "Summer Party",
+                category: "not category",
+                date: 01072020,
+                room: ["Backyard", "PoolRm1"]	
+            };
+        
+        });        
+    
+        it('and this function should return the period from an event', function() {
+            var result = getPeriod(evnt1);
+            expect (getPeriod).toBe("week");
         });
-        it('and this function should call the feedbackValidator function', function() {
-            
-            spyOn('feedbackValidator').andReturn(false);
-            feedbackInput(feedback);
-            expect(feedbackValidator).toBeCalled();
+
+        it('and this function should return the period from an event', function() {
+            var result = getPeriod(evnt2);
+            expect (getPeriod).toBe("mnth");
         });
-        it('and this function should call the formatDateTime function', function() {
-            spyOn('formatDateTime').andReturn(null);
-            feedbackInput(feedback);
-            expect(formatDateTime).toBeCalled();
+
+        it('and this function should return the period from an event', function() {
+            var result = getPeriod(evnt3);
+            expect (getPeriod).toBe("year");
         });
-        it('and this function should return a success', function() {
-            spyOn('feedbackValidator').andReturn(true);
-            spyOn('formatDateTime').andReturn("20200316082030000000");
-            var result = feedbackInput(feedback);
-            expect(result).toBeTruthy();
+
+
+        it('and this function should return false when this function fails', function() {
+            var result = getPeriod(badEvnt);
+            expect (getPeriod).toBeFalsy();
         });
-        it('and this function should return false when formatDateTime function fails', function() {
-            spyOn('feedbackValidator').andReturn(true);
-            spyOn('formatDateTime').andReturn("dfgikd");
-            var result = feedbackInput(feedback);
-            expect(result).toBeFalsy();
-        });
-        // THIS IS NOT A UNIT TEST AS THIS TEST GOES THROUGH TWO FUNCTIONS - feedbackInput & formatDateTime
-        it('and this function should return false when feedback.createDatetime is hello', function() {
-            spyOn('feedbackValidator').andReturn(true);
-            feedback.createDatetime = "hello";
-            var result = feedbackInput(feedback);
-            expect(result).toBeFalsy();
-        });
-        it('and this function should return a success for dates in the past', function() {
-            spyOn('feedbackValidator').andReturn(true);
-            spyOn('formatDateTime').andReturn("18500316082030000000");
-            console.log(feedback.createDatetime);
-            var result = feedbackInput(feedback);
-            expect(result).toBeTruthy();
-        });
+
     });
-    describe('should call the "saveFeedback" function', function(){
-    });
-    describe('should call the "feedbackValidator" function', function(){
-    });
-    describe('should call the "emailValidator" function', function(){
-    });
-    describe('should call the "formatDateTime" function', function(){
-    });
+
 });
+
+
+
+   
+
+
+/* if period is equal and if category is equal then return true*/
